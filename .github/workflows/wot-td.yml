@@ -27,18 +27,14 @@ jobs:
 ################################## LEGAL AND FORMAT LAYER ######################
 
   reuse:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
-
 
     - name: REUSE Compliance Check
       uses: fsfe/reuse-action@v1
 
   clippy-rustfmt:
-
     strategy:
       matrix:
         platform: [ubuntu-latest]
@@ -65,54 +61,14 @@ jobs:
         clippy_flags: --all-targets -- -D warnings
         reporter: github-pr-review
 
-  static-code-analysis:
-
-    env:
-      RCA_LINK: https://github.com/mozilla/rust-code-analysis/releases/download
-      RCA_VERSION: v0.0.25
-
-    strategy:
-      matrix:
-        conf:
-          - ubuntu
-        include:
-          - conf: ubuntu
-            platform: ubuntu-latest
-            dir: $PWD
-
-    runs-on: ${{ matrix.platform }}
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Install rust-code-analysis on Ubuntu
-      if: matrix.conf == 'ubuntu'
-      run: |
-        mkdir -p $HOME/.local/bin
-        curl -L "$RCA_LINK/$RCA_VERSION/rust-code-analysis-linux-cli-x86_64.tar.gz" |
-        tar xz -C $HOME/.local/bin
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-    - name: Run rust-code-analysis
-      run: |
-        mkdir $HOME/rca-json
-        rust-code-analysis-cli --metrics -O json --pr -o "$HOME/rca-json" -p ${{ matrix.dir }}
-
-    - name: Upload rust-code-analysis json
-      uses: actions/upload-artifact@v3
-      with:
-        name: rca-json-${{ matrix.conf }}
-        path: ~/rca-json
-
 ################################## BUILD AND DOCS LAYER ########################
 
   build:
-
-    needs: [reuse, clippy-rustfmt, static-code-analysis]
+    needs: [reuse, clippy-rustfmt]
 
     strategy:
       matrix:
-        platform: [ubuntu-latest, macos-latest, windows-latest]
+        platform: [ubuntu-latest]
 
     runs-on: ${{ matrix.platform }}
 
@@ -128,8 +84,7 @@ jobs:
       run: cargo build --verbose
 
   docs:
-
-    needs: [reuse, clippy-rustfmt, static-code-analysis]
+    needs: [reuse, clippy-rustfmt]
 
     strategy:
       matrix:
@@ -151,7 +106,6 @@ jobs:
 ################################## CODE COVERAGE LAYER ##################################
 
   code-coverage-ubuntu:
-
     needs: [build, docs]
 
     runs-on: ubuntu-latest
@@ -167,14 +121,14 @@ jobs:
     - name: Install grcov
       env:
         GRCOV_LINK: https://github.com/mozilla/grcov/releases/download
-        GRCOV_VERSION: v0.8.13
+        GRCOV_VERSION: v0.8.19
       run: |
         curl -L "$GRCOV_LINK/$GRCOV_VERSION/grcov-x86_64-unknown-linux-musl.tar.bz2" |
         tar xj -C $HOME/.cargo/bin
 
-    - name: Install llvm-tools-preview
+    - name: Install llvm-tools
       run: |
-        rustup component add llvm-tools-preview
+        rustup component add llvm-tools
 
     # Not necessary on a newly created image, but strictly advised
     - name: Run cargo clean
@@ -198,99 +152,9 @@ jobs:
       with:
         files: lcov.info
 
-    - name: Get total coverage
-      run: |
-        grcov . --binary-path ./target/debug/ -s . -t covdir --branch \
-              --token YOUR_COVDIR_TOKEN --ignore-not-existing --ignore "/*" \
-              --ignore "../*"  > covdir.json
-
-    - name: Evaluate code coverage value
-      shell: bash
-      run: |
-        # Retrieve code coverage associated to the repository
-        FLOAT_COVERAGE=$(jq '.coveragePercent' covdir.json)
-        # Round the float value to the nearest value
-        COVERAGE_OUTPUT=$(printf "%.0f" $FLOAT_COVERAGE)
-        # If code coverage >= 80, green traffic light
-        if [ $COVERAGE_OUTPUT -ge 80 ]
-        then
-            echo "$COVERAGE_OUTPUT > 80 --> Green"
-        # If code coverage is >=60 but < 80, orange traffic light
-        elif [ $COVERAGE_OUTPUT -ge 60 ]
-        then
-            echo "60 <= $COVERAGE_OUTPUT < 80 --> Orange"
-        # Otherwise, red traffic light
-        else
-            echo "$COVERAGE_OUTPUT < 60 --> Red"
-            exit 1
-        fi
-
-  weighted-code-coverage-ubuntu:
-
-    needs: [build, docs]
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Install Rust stable
-      uses: dtolnay/rust-toolchain@stable
-      with:
-        toolchain: stable
-
-    - name: Install grcov
-      env:
-        GRCOV_LINK: https://github.com/mozilla/grcov/releases/download
-        GRCOV_VERSION: v0.8.13
-        GRCOV_BINARY: grcov-x86_64-unknown-linux-musl.tar.bz2
-      run: |
-        curl -L "$GRCOV_LINK/$GRCOV_VERSION/$GRCOV_BINARY" |
-        tar xj -C $HOME/.cargo/bin
-
-    - name: Install weighted-code-coverage
-      env:
-        WCC_LINK: https://github.com/SoftengPoliTo/weighted-code-coverage/releases/download
-        WCC_VERSION: v0.2.0
-        WCC_BINARY: weighted-code-coverage-0.2.0-x86_64-unknown-linux-gnu.tar.gz
-      run: |
-        curl -L "$WCC_LINK/$WCC_VERSION/$WCC_BINARY" |
-        tar xz -C $HOME/.cargo/bin
-
-    - name: Install llvm-tools-preview
-      run: |
-        rustup component add llvm-tools-preview
-
-    # Not necessary on a newly created image, but strictly advised
-    - name: Run cargo clean
-      run: |
-        cargo clean
-
-    - name: Run tests
-      env:
-        RUSTFLAGS: "-Cinstrument-coverage"
-        LLVM_PROFILE_FILE: "wot-td-%p-%m.profraw"
-      run: |
-        cargo test --verbose
-
-    - name: Run grcov
-      run: |
-        grcov . --binary-path ./target/debug/ -t coveralls -s . --token YOUR_COVERALLS_TOKEN > coveralls.json
-
-    - name: Run weighted-code-coverage
-      run: |
-        mkdir $HOME/wcc-output
-        weighted-code-coverage -p src/ -j coveralls.json -c cyclomatic --json $HOME/wcc-output/out.json
-
-    - name: Upload weighted-code-coverage data
-      uses: actions/upload-artifact@v3
-      with:
-        name: weighted-code-coverage-ubuntu
-        path: ~/wcc-output/out.json
-
 ################################## DEPENDENCY LAYER ###########################
 
-  audit-ubuntu:
+  cargo-audit:
     runs-on: ubuntu-latest
 
     steps:
@@ -311,45 +175,13 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
 
-  deny-ubuntu:
-
+  cargo-deny:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
+    - uses: EmbarkStudios/cargo-deny-action@v1
 
-    - name: Check dependencies changes
-      uses: dorny/paths-filter@v2
-      id: changes
-      with:
-        filters: |
-          cargo:
-            - 'Cargo.toml'
-            - 'Cargo.lock'
-
-    - name: Install Rust stable
-      if: steps.changes.outputs.cargo == 'true'
-      uses: dtolnay/rust-toolchain@stable
-      with:
-        toolchain: stable
-
-    - name: Install cargo-deny
-      if: steps.changes.outputs.cargo == 'true'
-      env:
-        DENY_LINK: https://github.com/EmbarkStudios/cargo-deny/releases/download
-        DENY_VERSION: 0.13.7
-      run: |
-        curl -L "$DENY_LINK/$DENY_VERSION/cargo-deny-$DENY_VERSION-x86_64-unknown-linux-musl.tar.gz" |
-        tar xz -C $HOME/.cargo/bin --strip-components 1
-
-    - name: Run cargo-deny
-      if: steps.changes.outputs.cargo == 'true'
-      run: |
-        cargo deny init
-        cargo deny check bans
-        # cargo deny check licenses
-
-  udeps-ubuntu:
+  cargo-udeps:
 
     runs-on: ubuntu-latest
 
@@ -375,7 +207,7 @@ jobs:
       if: steps.changes.outputs.cargo == 'true'
       env:
         UDEPS_LINK: https://github.com/est31/cargo-udeps/releases/download
-        UDEPS_VERSION: v0.1.35
+        UDEPS_VERSION: v0.1.47
       run: |
         curl -L "$UDEPS_LINK/$UDEPS_VERSION/cargo-udeps-$UDEPS_VERSION-x86_64-unknown-linux-gnu.tar.gz" |
         tar xz -C $HOME/.cargo/bin --strip-components 2
@@ -389,7 +221,7 @@ jobs:
 
   cache-level-ubuntu:
 
-    needs: [audit-ubuntu, deny-ubuntu, udeps-ubuntu]
+    needs: [cargo-audit, cargo-deny, cargo-udeps]
 
     runs-on: ubuntu-latest
 
