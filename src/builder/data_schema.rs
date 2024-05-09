@@ -421,10 +421,6 @@ where
     }
 }
 
-trait IntoDataSchema: Into<Self::Target> {
-    type Target: Sized;
-}
-
 /// An interface for a buildable version of a [`DataSchema`](crate::thing::DataSchema).
 ///
 /// In order to model the specification, each type that can be created using a builder pattern and
