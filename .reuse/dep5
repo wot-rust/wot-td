@@ -5,3 +5,7 @@ Source: https://github.com/wot-rust/wot-td
 Files: *
 Copyright: 2022 sifis-home, wot-rust developers
 License: MIT
+
+Files: src/flat_map_serialize.rs
+Copyright: 2018 Armin Ronacher, David Tolnay, Alexander Sergey
+License: MIT
