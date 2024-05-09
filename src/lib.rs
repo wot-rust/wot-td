@@ -80,3 +80,5 @@ pub mod protocol;
 pub mod thing;
 
 pub use crate::thing::Thing;
+
+mod flat_map_serialize;
