@@ -390,12 +390,38 @@ where
     }
 }
 
+// Do not serialize the fields that are shared with DataSchema
+fn omit_common<S, O>(i: &InteractionAffordance<O>, ser: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+    O: ExtendableThing,
+{
+    use serde::ser::SerializeMap;
+
+    let mut s = ser.serialize_map(Some(3))?;
+    s.serialize_entry("forms", &i.forms)?;
+    if i.uri_variables.is_some() {
+        s.serialize_entry("uriVariables", &i.uri_variables)?;
+    }
+
+    Serialize::serialize(
+        &&i.other,
+        crate::flat_map_serialize::FlatMapSerializer(&mut s),
+    )?;
+
+    s.end()
+}
+
 /// An affordance that exposes the state of a `Thing`
+///
+/// The fields `title`, `titles`, `description`, `descriptions`,
+/// are serialized from `PropertyAffordance::data_schema`.
 #[skip_serializing_none]
 #[derive(Deserialize, Serialize)]
 pub struct PropertyAffordance<Other: ExtendableThing> {
     /// The interaction affordance.
     #[serde(flatten)]
+    #[serde(serialize_with = "omit_common")]
     pub interaction: InteractionAffordance<Other>,
 
     /// The data schema representing the property.
