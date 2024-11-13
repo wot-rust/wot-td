@@ -18,7 +18,7 @@ serde = { version = "1.0.137", features = ["derive"] }
 serde_json = { version = "1.0.81", default-features = false }
 serde_repr = "0.1.9"
 serde_with = { version = "3.7.0", default-features = false, features = ["macros"] }
-thiserror = "1.0.31"
+thiserror = "2.0.3"
 time = { version = "0.3.11", features = ["serde", "serde-well-known"] }
 
 [dev-dependencies]
