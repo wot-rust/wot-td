@@ -39,7 +39,9 @@
 //! [`finish_extend`]: DataSchemaBuilder::finish_extend
 //! [`read_only`]: crate::thing::DataSchema::read_only
 //! [`write_only`]: crate::thing::DataSchema::write_only
-use std::{cmp::Ordering, collections::HashMap, marker::PhantomData, num::NonZeroU64, ops::Not};
+use std::{cmp::Ordering, marker::PhantomData, num::NonZeroU64, ops::Not};
+
+use hashbrown::HashMap;
 
 use crate::{
     extend::{Extend, Extendable, ExtendableThing},
