@@ -206,8 +206,9 @@ pub mod affordance;
 pub mod data_schema;
 mod human_readable_info;
 
-use std::{collections::HashMap, fmt, marker::PhantomData, ops::Not};
+use std::{fmt, marker::PhantomData, ops::Not};
 
+use hashbrown::{hash_map::Entry, HashMap};
 use oxilangtag::LanguageTag;
 use serde_json::Value;
 use time::OffsetDateTime;
@@ -759,8 +760,6 @@ impl<Other: ExtendableThing, Status> ThingBuilder<Other, Status> {
     ///
     /// This step will perform the final validation of the builder state.
     pub fn build(self) -> Result<Thing<Other>, Error> {
-        use std::collections::hash_map::Entry;
-
         let Self {
             context,
             id,
@@ -1696,8 +1695,6 @@ where
     A: BuildableAffordance<Target = T>,
     H: Fn(FormOperation) -> bool,
 {
-    use std::collections::hash_map::Entry;
-
     affordances
         .is_empty()
         .not()

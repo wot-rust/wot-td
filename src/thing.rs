@@ -10,11 +10,11 @@
 use std::{
     borrow::Cow,
     cmp::{self, Ordering},
-    collections::HashMap,
     fmt,
     num::NonZeroU64,
 };
 
+use hashbrown::HashMap;
 use oxilangtag::LanguageTag;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde_json::Value;

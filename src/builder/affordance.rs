@@ -5,8 +5,9 @@
 //!
 //! See the examples related to the specific affordance bulders for more information.
 
-use std::{collections::HashMap, ops::Not};
+use std::ops::Not;
 
+use hashbrown::HashMap;
 use serde_json::Value;
 
 use crate::{
