@@ -39,7 +39,8 @@
 //! [`finish_extend`]: DataSchemaBuilder::finish_extend
 //! [`read_only`]: crate::thing::DataSchema::read_only
 //! [`write_only`]: crate::thing::DataSchema::write_only
-use std::{cmp::Ordering, marker::PhantomData, num::NonZeroU64, ops::Not};
+use alloc::{boxed::Box, string::String, vec::Vec};
+use core::{cmp::Ordering, marker::PhantomData, num::NonZeroU64, ops::Not};
 
 use hashbrown::HashMap;
 
@@ -2059,7 +2060,7 @@ macro_rules! impl_inner_delegate_schema_builder_like_integer {
         }
 
         #[inline]
-        fn multiple_of(mut self, value: std::num::NonZeroU64) -> Self {
+        fn multiple_of(mut self, value: core::num::NonZeroU64) -> Self {
             self.$inner = self.$inner.multiple_of(value);
             self
         }
@@ -4050,6 +4051,7 @@ impl<DS, AS, OS> TryFrom<UncheckedObjectSchema<DS, AS, OS>> for ObjectSchema<DS,
 
 #[cfg(test)]
 mod tests {
+    use alloc::{boxed::Box, string::*, vec};
     use serde::{Deserialize, Serialize};
     use serde_json::json;
 

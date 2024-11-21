@@ -234,6 +234,7 @@ impl From<Nil> for () {
 
 #[cfg(test)]
 mod tests {
+    use alloc::string::*;
     use serde_json::{json, Value};
 
     use super::*;

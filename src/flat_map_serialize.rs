@@ -1,3 +1,4 @@
+use alloc::vec::Vec;
 use core::fmt::{self, Display};
 use serde::ser::{self, Impossible, Serialize, SerializeMap, Serializer};
 
@@ -49,6 +50,7 @@ impl Display for Unsupported {
 
 #[cfg(any(feature = "std", feature = "alloc"))]
 mod content {
+    use alloc::{borrow::ToOwned, boxed::Box, string::String, vec::Vec};
     use core::marker::PhantomData;
     use serde::ser::{self, Serialize, Serializer};
 

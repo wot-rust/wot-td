@@ -7,8 +7,8 @@
 //!
 //! [Interaction Affordance]: https://www.w3.org/TR/wot-thing-description/#interactionaffordance
 
-use std::{
-    borrow::Cow,
+use alloc::{borrow::Cow, boxed::Box, string::*, vec::Vec};
+use core::{
     cmp::{self, Ordering},
     fmt,
     num::NonZeroU64,
@@ -1764,6 +1764,8 @@ const fn is_false(b: &bool) -> bool {
 
 #[cfg(test)]
 mod test {
+    use alloc::vec;
+
     use serde_json::json;
     use time::macros::datetime;
 
@@ -3074,7 +3076,7 @@ mod test {
 
     #[test]
     fn maximum_partial_ord_trivial() {
-        use std::cmp::Ordering;
+        use core::cmp::Ordering;
         assert_eq!(
             Maximum::Inclusive(5).partial_cmp(&Maximum::Inclusive(5)),
             Some(Ordering::Equal),

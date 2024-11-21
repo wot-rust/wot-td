@@ -206,7 +206,8 @@ pub mod affordance;
 pub mod data_schema;
 mod human_readable_info;
 
-use std::{fmt, marker::PhantomData, ops::Not};
+use alloc::{borrow::ToOwned, fmt, string::*, vec, vec::Vec};
+use core::{marker::PhantomData, ops::Not};
 
 use hashbrown::{hash_map::Entry, HashMap};
 use oxilangtag::LanguageTag;
@@ -996,7 +997,7 @@ impl<Other: ExtendableThing, Status> ThingBuilder<Other, Status> {
                     if security_definitions.contains_key(security) {
                         Ok(())
                     } else {
-                        Err(Error::UndefinedSecurity(std::mem::take(security)))
+                        Err(Error::UndefinedSecurity(core::mem::take(security)))
                     }
                 })
             })
@@ -1847,7 +1848,7 @@ impl<T> LinkBuilder<T> {
 
 /// The builder elements related to security
 pub mod security {
-    use std::borrow::Cow;
+    use alloc::{borrow::Cow, string::*, vec::Vec};
 
     use serde_json::Value;
 
@@ -3026,7 +3027,7 @@ impl TryFrom<UncheckedLink> for Link {
 
 #[cfg(test)]
 mod tests {
-    use std::borrow::Cow;
+    use alloc::borrow::Cow;
 
     use serde::{Deserialize, Serialize};
     use serde_json::json;

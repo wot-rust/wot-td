@@ -3,6 +3,8 @@
 //! This module contains the logic shared across multiple builders for the respective
 //! Thing Description Vocabulary definitions.
 
+use alloc::{string::*, vec::Vec};
+
 use super::MultiLanguageBuilder;
 
 /// Human readable informations and semantic tagging

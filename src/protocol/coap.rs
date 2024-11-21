@@ -95,6 +95,8 @@ impl ExtendableThing for CoapProtocol {
 
 #[cfg(test)]
 mod test {
+    use alloc::vec;
+
     use super::{BlockSize, CoapProtocol};
     use crate::thing::{ExpectedResponse, Form};
     fn deserialize_form(s: &str, r: Form<CoapProtocol>) {
