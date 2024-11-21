@@ -45,6 +45,94 @@ pub const TD_CONTEXT_10: &str = "https://www.w3.org/2019/wot/td/v1";
 /// description](https://www.w3.org/TR/wot-thing-description11/)
 pub const TD_CONTEXT_11: &str = "https://www.w3.org/2022/wot/td/v1.1";
 
+mod rfc3339_option {
+    use core::fmt;
+
+    use alloc::format;
+    use serde::{ser::Error, Serialize, Serializer};
+    use time::OffsetDateTime;
+
+    pub use time::serde::rfc3339::option::deserialize;
+
+    // time uses std::io::Write internally making the serializer unavailable
+    // for no_std
+    // https://github.com/time-rs/time/issues/375
+    pub fn serialize<S: Serializer>(
+        option: &Option<OffsetDateTime>,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error> {
+        option
+            .map(|odt| {
+                let date = odt.date();
+                let time = odt.time();
+                let offset = odt.offset();
+
+                let year = date.year();
+
+                if !(0..10_000).contains(&year) {
+                    return Err(fmt::Error);
+                }
+                if offset.whole_hours().unsigned_abs() > 23 {
+                    return Err(fmt::Error);
+                }
+                if offset.seconds_past_minute() != 0 {
+                    return Err(fmt::Error);
+                }
+
+                let month = u8::from(date.month());
+                let day = date.day();
+
+                let hour = time.hour();
+                let minute = time.minute();
+                let second = time.second();
+
+                let ns = time.nanosecond();
+
+                let subsecond = if ns == 0 {
+                    ""
+                } else if ns % 10 != 0 {
+                    &format!(".{:09}", ns)
+                } else if (ns / 10) % 10 != 0 {
+                    &format!(".{:08}", ns / 10)
+                } else if (ns / 100) % 10 != 0 {
+                    &format!(".{:07}", ns / 100)
+                } else if (ns / 1_000) % 10 != 0 {
+                    &format!(".{:06}", ns / 1_000)
+                } else if (ns / 10_000) % 10 != 0 {
+                    &format!(".{:05}", ns / 10_000)
+                } else if (ns / 100_000) % 10 != 0 {
+                    &format!(".{:04}", ns / 100_000)
+                } else if (ns / 1_000_000) % 10 != 0 {
+                    &format!(".{:03}", ns / 1_000_000)
+                } else if (ns / 10_000_000) % 10 != 0 {
+                    &format!(".{:02}", ns / 10_000_000)
+                } else {
+                    &format!(".{:01}", ns / 100_000_000)
+                };
+
+                let tz_h = offset.whole_hours().unsigned_abs();
+                let tz_m = offset.minutes_past_hour().unsigned_abs();
+
+                let tzs = if offset.is_utc() {
+                    "Z"
+                } else if offset.is_negative() {
+                    &format!("-{tz_h:02}:{tz_m:02}")
+                } else {
+                    &format!("+{tz_h:02}:{tz_m:02}")
+                };
+
+                let s = format!(
+                    "{year:02}-{month:02}-{day:02}T{hour:02}:{minute:02}:{second:02}{subsecond}{tzs}"
+                );
+
+                Ok(s)
+            })
+            .transpose()
+            .map_err(S::Error::custom)?
+            .serialize(serializer)
+    }
+}
+
 /// An abstraction of a physical or a virtual entity
 ///
 /// It contains metadata and a description of its interfaces.
@@ -86,13 +174,13 @@ pub struct Thing<Other: ExtendableThing = Nil> {
     /// Time of creation of this description
     ///
     /// It may be used for caching purposes.
-    #[serde(with = "time::serde::rfc3339::option", default)]
+    #[serde(with = "rfc3339_option", default)]
     pub created: Option<OffsetDateTime>,
 
     /// Time of last update of this description
     ///
     /// It may be used for caching purposes.
-    #[serde(with = "time::serde::rfc3339::option", default)]
+    #[serde(with = "rfc3339_option", default)]
     pub modified: Option<OffsetDateTime>,
 
     /// URI to the device maintainer
