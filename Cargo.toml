@@ -20,7 +20,7 @@ serde_json = { version = "1.0.81", default-features = false }
 serde_repr = "0.1.9"
 serde_with = { version = "3.7.0", default-features = false, features = ["macros"] }
 thiserror = { version = "2.0.3", default-features = false }
-time = { version = "0.3.11", features = ["serde", "serde-well-known"] }
+time = { version = "0.3.11", features = ["serde", "serde-well-known"], default-features = false }
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"
