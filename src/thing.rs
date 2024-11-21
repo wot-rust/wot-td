@@ -15,11 +15,11 @@ use core::{
 };
 
 use hashbrown::HashMap;
+use jiff::Timestamp;
 use oxilangtag::LanguageTag;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde_json::Value;
 use serde_with::{serde_as, skip_serializing_none, DeserializeAs, OneOrMany, Same};
-use time::OffsetDateTime;
 
 use crate::{
     builder::{data_schema::UncheckedDataSchema, ThingBuilder, ToExtend},
@@ -86,14 +86,14 @@ pub struct Thing<Other: ExtendableThing = Nil> {
     /// Time of creation of this description
     ///
     /// It may be used for caching purposes.
-    #[serde(with = "time::serde::rfc3339::option", default)]
-    pub created: Option<OffsetDateTime>,
+    #[serde(default)]
+    pub created: Option<Timestamp>,
 
     /// Time of last update of this description
     ///
     /// It may be used for caching purposes.
-    #[serde(with = "time::serde::rfc3339::option", default)]
-    pub modified: Option<OffsetDateTime>,
+    #[serde(default)]
+    pub modified: Option<Timestamp>,
 
     /// URI to the device maintainer
     ///
@@ -1767,7 +1767,6 @@ mod test {
     use alloc::vec;
 
     use serde_json::json;
-    use time::macros::datetime;
 
     use crate::hlist::Cons;
 
@@ -1937,8 +1936,8 @@ mod test {
                 instance: "0.1.0".to_string(),
                 model: Some("model".to_string()),
             }),
-            created: Some(datetime!(2022-05-01 10:20:42.123 UTC)),
-            modified: Some(datetime!(2022-05-10 12:30 +1)),
+            created: Some("2022-05-01 10:20:42.123 UTC".parse().unwrap()),
+            modified: Some("2022-05-10 12:30 +1".parse().unwrap()),
             support: Some("mailto:mail@test.com".to_string()),
             base: Some("https://mylamp.example.com/".to_string()),
             properties: Some(

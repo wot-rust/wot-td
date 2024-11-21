@@ -8,20 +8,19 @@ repository = "https://github.com/wot-rust/wot-td"
 keywords = ["wot", "WebofThings"]
 
 [features]
+alloc = ["serde/alloc", "serde_json/alloc", "serde_with/alloc", "oxilangtag/alloc", "hashbrown/allocator-api2", "jiff/alloc"]
 default = ["std"]
-std = ["serde/std", "serde_json/std", "serde_with/std", "time/std", "oxilangtag/std", "hashbrown/allocator-api2", "thiserror/std"]
-alloc = ["serde/alloc", "serde_json/alloc", "serde_with/alloc", "time/alloc", "oxilangtag/alloc", "hashbrown/allocator-api2"]
+std = ["serde/std", "serde_json/std", "serde_with/std", "oxilangtag/std", "hashbrown/allocator-api2", "thiserror/std", "jiff/std"]
 
 [dependencies]
 hashbrown = { version = "0.15.1", default-features = false, features = ["core", "serde", "default-hasher", "inline-more", "equivalent"] }
+jiff = { version = "0.1.14", default-features = false, features = ["alloc", "serde"] }
 oxilangtag = { version = "0.1.5", features = ["serialize"], default-features = false }
 serde = { version = "1.0.137", features = ["derive"], default-features = false }
 serde_json = { version = "1.0.81", default-features = false }
 serde_repr = "0.1.9"
 serde_with = { version = "3.7.0", default-features = false, features = ["macros"] }
 thiserror = { version = "2.0.3", default-features = false }
-time = { version = "0.3.11", features = ["serde", "serde-well-known"], default-features = false }
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"
-time = { version = "0.3.9", features = ["macros"] }

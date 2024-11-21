@@ -210,9 +210,9 @@ use alloc::{borrow::ToOwned, fmt, string::*, vec, vec::Vec};
 use core::{marker::PhantomData, ops::Not};
 
 use hashbrown::{hash_map::Entry, HashMap};
+use jiff::Timestamp;
 use oxilangtag::LanguageTag;
 use serde_json::Value;
-use time::OffsetDateTime;
 
 use crate::{
     extend::{Extend, Extendable, ExtendableThing},
@@ -267,8 +267,8 @@ pub struct ThingBuilder<Other: ExtendableThing, Status> {
     description: Option<String>,
     descriptions: Option<MultiLanguageBuilder<String>>,
     version: Option<VersionInfo>,
-    created: Option<OffsetDateTime>,
-    modified: Option<OffsetDateTime>,
+    created: Option<Timestamp>,
+    modified: Option<Timestamp>,
     support: Option<String>,
     base: Option<String>,
     properties: Vec<AffordanceBuilder<UsablePropertyAffordanceBuilder<Other>>>,
@@ -1066,8 +1066,8 @@ impl<Other: ExtendableThing, Status> ThingBuilder<Other, Status> {
         id: String,
         description: String,
         version: VersionInfo,
-        created: OffsetDateTime,
-        modified: OffsetDateTime,
+        created: Timestamp,
+        modified: Timestamp,
         support: String,
         base: String,
     );
@@ -3031,7 +3031,6 @@ mod tests {
 
     use serde::{Deserialize, Serialize};
     use serde_json::json;
-    use time::macros::datetime;
 
     use crate::{
         builder::{
@@ -3238,9 +3237,9 @@ mod tests {
 
     #[test]
     fn created() {
-        const DATETIME: OffsetDateTime = datetime!(2022-05-01 12:13:14.567 +01:00);
+        let ts: jiff::Timestamp = "2022-05-01 12:13:14.567Z".parse().unwrap();
         let thing = ThingBuilder::<Nil, _>::new("MyLampThing")
-            .created(DATETIME)
+            .created(ts)
             .build()
             .unwrap();
 
@@ -3249,7 +3248,7 @@ mod tests {
             Thing {
                 context: TD_CONTEXT_11.into(),
                 title: "MyLampThing".to_string(),
-                created: Some(DATETIME),
+                created: Some(ts),
                 ..Default::default()
             }
         );
@@ -3257,9 +3256,9 @@ mod tests {
 
     #[test]
     fn modified() {
-        const DATETIME: OffsetDateTime = datetime!(2022-05-01 12:13:14.567 +01:00);
+        let ts: jiff::Timestamp = "2022-05-01 12:13:14.567Z".parse().unwrap();
         let thing = ThingBuilder::<Nil, _>::new("MyLampThing")
-            .modified(DATETIME)
+            .modified(ts)
             .build()
             .unwrap();
 
@@ -3268,7 +3267,7 @@ mod tests {
             Thing {
                 context: TD_CONTEXT_11.into(),
                 title: "MyLampThing".to_string(),
-                modified: Some(DATETIME),
+                modified: Some(ts),
                 ..Default::default()
             }
         );
