@@ -1,5 +1,7 @@
 //! HTTP Binding Template
 
+use alloc::{string::String, vec::Vec};
+
 use crate::extend::ExtendableThing;
 use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, skip_serializing_none};
@@ -65,6 +67,8 @@ impl ExtendableThing for HttpProtocol {
 
 #[cfg(test)]
 mod test {
+    use alloc::vec;
+
     use super::HttpProtocol;
     use crate::thing::{ExpectedResponse, Form};
 

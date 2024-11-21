@@ -5,7 +5,8 @@
 //!
 //! See the examples related to the specific affordance bulders for more information.
 
-use std::ops::Not;
+use alloc::{string::String, vec::Vec};
+use core::ops::Not;
 
 use hashbrown::HashMap;
 use serde_json::Value;
@@ -2788,6 +2789,8 @@ where
 
 #[cfg(test)]
 mod test {
+    use alloc::{borrow::ToOwned, boxed::Box, string::*, vec};
+
     use serde::{Deserialize, Serialize};
     use serde_json::json;
 

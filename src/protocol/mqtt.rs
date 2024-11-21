@@ -1,5 +1,7 @@
 //! MQTT Binding Template
 
+use alloc::{string::String, vec::Vec};
+
 use crate::extend::ExtendableThing;
 use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, skip_serializing_none, OneOrMany};
@@ -33,7 +35,7 @@ pub enum QoS {
 pub struct Form {
     #[serde(
         rename = "mqv:retain",
-        skip_serializing_if = "std::ops::Not::not",
+        skip_serializing_if = "core::ops::Not::not",
         default
     )]
     pub retain: bool,
@@ -66,6 +68,8 @@ impl ExtendableThing for MqttProtocol {
 
 #[cfg(test)]
 mod test {
+    use alloc::vec;
+
     use super::MqttProtocol;
     use crate::thing::Form;
     use crate::thing::{DefaultedFormOperations::Custom, FormOperation::*};
