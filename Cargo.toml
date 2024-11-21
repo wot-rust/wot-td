@@ -9,7 +9,7 @@ keywords = ["wot", "WebofThings"]
 
 [features]
 default = ["std"]
-std = ["serde/std", "serde_json/std", "serde_with/std", "time/std", "oxilangtag/std", "hashbrown/allocator-api2"]
+std = ["serde/std", "serde_json/std", "serde_with/std", "time/std", "oxilangtag/std", "hashbrown/allocator-api2", "thiserror/std"]
 alloc = ["serde/alloc", "serde_json/alloc", "serde_with/alloc", "time/alloc", "oxilangtag/alloc", "hashbrown/allocator-api2"]
 
 [dependencies]
@@ -19,7 +19,7 @@ serde = { version = "1.0.137", features = ["derive"], default-features = false }
 serde_json = { version = "1.0.81", default-features = false }
 serde_repr = "0.1.9"
 serde_with = { version = "3.7.0", default-features = false, features = ["macros"] }
-thiserror = "2.0.3"
+thiserror = { version = "2.0.3", default-features = false }
 time = { version = "0.3.11", features = ["serde", "serde-well-known"] }
 
 [dev-dependencies]
