@@ -15,7 +15,7 @@ alloc = ["serde/alloc", "serde_json/alloc", "serde_with/alloc", "time/alloc", "o
 [dependencies]
 hashbrown = { version = "0.15.1", default-features = false, features = ["serde", "default-hasher", "inline-more", "equivalent"] }
 oxilangtag = { version = "0.1.5", features = ["serialize"], default-features = false }
-serde = { version = "1.0.137", features = ["derive"], default-features = false }
+serde = { version = "1.0.216", features = ["derive"], default-features = false }
 serde_json = { version = "1.0.81", default-features = false }
 serde_repr = "0.1.9"
 serde_with = { version = "3.7.0", default-features = false, features = ["macros"] }
