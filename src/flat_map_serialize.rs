@@ -968,31 +968,3 @@ where
         Ok(())
     }
 }
-
-pub struct AdjacentlyTaggedEnumVariant {
-    pub enum_name: &'static str,
-    pub variant_index: u32,
-    pub variant_name: &'static str,
-}
-
-impl Serialize for AdjacentlyTaggedEnumVariant {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        serializer.serialize_unit_variant(self.enum_name, self.variant_index, self.variant_name)
-    }
-}
-
-// Error when Serialize for a non_exhaustive remote enum encounters a variant
-// that is not recognized.
-pub struct CannotSerializeVariant<T>(pub T);
-
-impl<T> Display for CannotSerializeVariant<T>
-where
-    T: core::fmt::Debug,
-{
-    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        write!(formatter, "enum variant cannot be serialized: {:?}", self.0)
-    }
-}

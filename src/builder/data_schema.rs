@@ -2114,7 +2114,6 @@ macro_rules! impl_delegate_schema_builder_like {
         )+
     };
 }
-pub(super) use impl_delegate_schema_builder_like;
 pub(super) use impl_inner_delegate_schema_builder_like_integer;
 pub(super) use impl_inner_delegate_schema_builder_like_number;
 pub(super) use impl_inner_delegate_schema_builder_like_object;
