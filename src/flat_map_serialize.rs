@@ -11,7 +11,6 @@ macro_rules! tri {
     };
 }
 
-#[cfg(any(feature = "std", feature = "alloc"))]
 use self::content::{Content, ContentSerializer};
 
 enum Unsupported {
@@ -21,7 +20,6 @@ enum Unsupported {
     Char,
     String,
     ByteArray,
-    #[cfg(any(feature = "std", feature = "alloc"))]
     UnitStruct,
     Sequence,
     Tuple,
@@ -38,7 +36,6 @@ impl Display for Unsupported {
             Unsupported::Char => formatter.write_str("a char"),
             Unsupported::String => formatter.write_str("a string"),
             Unsupported::ByteArray => formatter.write_str("a byte array"),
-            #[cfg(any(feature = "std", feature = "alloc"))]
             Unsupported::UnitStruct => formatter.write_str("unit struct"),
             Unsupported::Sequence => formatter.write_str("a sequence"),
             Unsupported::Tuple => formatter.write_str("a tuple"),
@@ -48,7 +45,6 @@ impl Display for Unsupported {
     }
 }
 
-#[cfg(any(feature = "std", feature = "alloc"))]
 mod content {
     use alloc::{borrow::ToOwned, boxed::Box, string::String, vec::Vec};
     use core::marker::PhantomData;
@@ -621,10 +617,8 @@ mod content {
     }
 }
 
-#[cfg(any(feature = "std", feature = "alloc"))]
 pub struct FlatMapSerializer<'a, M: 'a>(pub &'a mut M);
 
-#[cfg(any(feature = "std", feature = "alloc"))]
 impl<'a, M> FlatMapSerializer<'a, M>
 where
     M: SerializeMap + 'a,
@@ -637,7 +631,6 @@ where
     }
 }
 
-#[cfg(any(feature = "std", feature = "alloc"))]
 impl<'a, M> Serializer for FlatMapSerializer<'a, M>
 where
     M: SerializeMap + 'a,
@@ -816,10 +809,8 @@ where
     }
 }
 
-#[cfg(any(feature = "std", feature = "alloc"))]
 pub struct FlatMapSerializeMap<'a, M: 'a>(&'a mut M);
 
-#[cfg(any(feature = "std", feature = "alloc"))]
 impl<'a, M> ser::SerializeMap for FlatMapSerializeMap<'a, M>
 where
     M: SerializeMap + 'a,
@@ -854,10 +845,8 @@ where
     }
 }
 
-#[cfg(any(feature = "std", feature = "alloc"))]
 pub struct FlatMapSerializeStruct<'a, M: 'a>(&'a mut M);
 
-#[cfg(any(feature = "std", feature = "alloc"))]
 impl<'a, M> ser::SerializeStruct for FlatMapSerializeStruct<'a, M>
 where
     M: SerializeMap + 'a,
@@ -879,13 +868,11 @@ where
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#[cfg(any(feature = "std", feature = "alloc"))]
 pub struct FlatMapSerializeTupleVariantAsMapValue<'a, M: 'a> {
     map: &'a mut M,
     fields: Vec<Content>,
 }
 
-#[cfg(any(feature = "std", feature = "alloc"))]
 impl<'a, M> FlatMapSerializeTupleVariantAsMapValue<'a, M>
 where
     M: SerializeMap + 'a,
@@ -898,7 +885,6 @@ where
     }
 }
 
-#[cfg(any(feature = "std", feature = "alloc"))]
 impl<'a, M> ser::SerializeTupleVariant for FlatMapSerializeTupleVariantAsMapValue<'a, M>
 where
     M: SerializeMap + 'a,
@@ -923,14 +909,12 @@ where
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#[cfg(any(feature = "std", feature = "alloc"))]
 pub struct FlatMapSerializeStructVariantAsMapValue<'a, M: 'a> {
     map: &'a mut M,
     name: &'static str,
     fields: Vec<(&'static str, Content)>,
 }
 
-#[cfg(any(feature = "std", feature = "alloc"))]
 impl<'a, M> FlatMapSerializeStructVariantAsMapValue<'a, M>
 where
     M: SerializeMap + 'a,
@@ -944,7 +928,6 @@ where
     }
 }
 
-#[cfg(any(feature = "std", feature = "alloc"))]
 impl<'a, M> ser::SerializeStructVariant for FlatMapSerializeStructVariantAsMapValue<'a, M>
 where
     M: SerializeMap + 'a,
